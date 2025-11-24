@@ -1,0 +1,72 @@
+@model List<ECommerce.Web.Models.CartItem>
+@{
+    ViewData["Title"] = "Sepetim";
+}
+
+<h2>Sepetim</h2>
+
+@if (Model.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Ürün</th>
+                <th>Fiyat</th>
+                <th>Miktar</th>
+                <th>Toplam</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                decimal total = 0;
+            }
+            @foreach (var item in Model)
+            {
+                var itemTotal = item.Product.Price * item.Quantity;
+                total += itemTotal;
+                <tr>
+                    <td>
+                        <strong>@item.Product.Name</strong><br>
+                        <small class="text-muted">@item.Product.CategoryName</small>
+                    </td>
+                    <td>@item.Product.Price.ToString("C")</td>
+                    <td>
+                        <form asp-action="UpdateQuantity" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@item.Id">
+                            <input type="number" name="quantity" value="@item.Quantity" min="1" max="@item.Product.Stock" 
+                                   class="form-control form-control-sm d-inline" style="width: 80px;" 
+                                   onchange="this.form.submit()">
+                        </form>
+                    </td>
+                    <td>@itemTotal.ToString("C")</td>
+                    <td>
+                        <form asp-action="Remove" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@item.Id">
+                            <button type="submit" class="btn btn-danger btn-sm">Kaldır</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="3" class="text-end">Toplam:</th>
+                <th>@total.ToString("C")</th>
+                <th></th>
+            </tr>
+        </tfoot>
+    </table>
+    
+    <div class="mt-4">
+        <form asp-controller="Orders" asp-action="Create" method="post">
+            <button type="submit" class="btn btn-success btn-lg">Siparişi Tamamla</button>
+        </form>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        Sepetiniz boş. <a asp-controller="Home" asp-action="Index">Alışverişe başlayın</a>
+    </div>
+}

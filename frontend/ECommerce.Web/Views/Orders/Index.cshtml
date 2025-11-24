@@ -1,0 +1,55 @@
+@model List<ECommerce.Web.Models.Order>
+@{
+    ViewData["Title"] = "Siparişlerim";
+}
+
+<h2>Siparişlerim</h2>
+
+@if (Model.Any())
+{
+    @foreach (var order in Model)
+    {
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between">
+                <div>
+                    <strong>Sipariş #@order.Id</strong> - @order.OrderDate.ToString("dd.MM.yyyy HH:mm")
+                </div>
+                <div>
+                    <span class="badge bg-info">@order.Status</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Ürün</th>
+                            <th>Miktar</th>
+                            <th>Birim Fiyat</th>
+                            <th>Toplam</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in order.OrderItems)
+                        {
+                            <tr>
+                                <td>@item.Product.Name</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.Price.ToString("C")</td>
+                                <td>@((item.Price * item.Quantity).ToString("C"))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="text-end mt-3">
+                    <strong>Toplam: @order.TotalAmount.ToString("C")</strong>
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="alert alert-info">
+        Henüz siparişiniz yok. <a asp-controller="Home" asp-action="Index">Alışverişe başlayın</a>
+    </div>
+}

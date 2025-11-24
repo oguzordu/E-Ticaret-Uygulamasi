@@ -1,0 +1,29 @@
+@model List<ECommerce.Web.Models.Category>
+@{
+    ViewData["Title"] = "Kategori Yönetimi";
+}
+
+<h2>Kategori Yönetimi</h2>
+
+<div class="alert alert-info">
+    <strong>Not:</strong> Bu sayfa sadece görüntüleme amaçlıdır. Kategori ekleme, düzenleme ve silme işlemleri API üzerinden yapılmalıdır.
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Kategori Adı</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var category in Model)
+        {
+            <tr>
+                <td>@category.Id</td>
+                <td>@category.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>
+

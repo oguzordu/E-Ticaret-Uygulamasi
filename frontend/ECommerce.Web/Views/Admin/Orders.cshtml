@@ -1,0 +1,63 @@
+@model List<ECommerce.Web.Models.Order>
+@{
+    ViewData["Title"] = "Sipariş Yönetimi";
+}
+
+<h2>Sipariş Yönetimi</h2>
+
+@if (Model.Any())
+{
+    @foreach (var order in Model)
+    {
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>Sipariş #@order.Id</strong> - @order.OrderDate.ToString("dd.MM.yyyy HH:mm")
+                </div>
+                <div class="d-flex gap-2 align-items-center">
+                    <span class="badge bg-info">@order.Status</span>
+                    <form asp-action="UpdateOrderStatus" method="post" class="d-inline">
+                        <input type="hidden" name="orderId" value="@order.Id">
+                        <select name="status" class="form-select form-select-sm d-inline" style="width: auto;" onchange="this.form.submit()">
+                            <option value="Hazırlanıyor" selected="@(order.Status == "Hazırlanıyor")">Hazırlanıyor</option>
+                            <option value="Kargoda" selected="@(order.Status == "Kargoda")">Kargoda</option>
+                            <option value="Teslim Edildi" selected="@(order.Status == "Teslim Edildi")">Teslim Edildi</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Ürün</th>
+                            <th>Miktar</th>
+                            <th>Birim Fiyat</th>
+                            <th>Toplam</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in order.OrderItems)
+                        {
+                            <tr>
+                                <td>@item.Product.Name</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.Price.ToString("C")</td>
+                                <td>@((item.Price * item.Quantity).ToString("C"))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="text-end">
+                    <strong>Toplam: @order.TotalAmount.ToString("C")</strong>
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="alert alert-info">
+        Henüz sipariş yok.
+    </div>
+}

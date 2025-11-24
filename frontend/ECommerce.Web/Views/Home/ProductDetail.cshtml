@@ -1,0 +1,33 @@
+@model ECommerce.Web.Models.Product
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <h2>@Model.Name</h2>
+        <p class="text-muted">@Model.CategoryName</p>
+        <h3 class="text-primary mb-4">@Model.Price.ToString("C")</h3>
+        <p><strong>Stok:</strong> @Model.Stock adet</p>
+        
+        @if (string.IsNullOrEmpty(Context.Session.GetString("Token")))
+        {
+            <div class="alert alert-warning">
+                Sepete eklemek için <a asp-controller="Auth" asp-action="Login">giriş yapın</a>.
+            </div>
+        }
+        else
+        {
+            <form asp-controller="Cart" asp-action="AddToCart" method="post" class="mt-4">
+                <input type="hidden" name="productId" value="@Model.Id">
+                <div class="mb-3">
+                    <label for="quantity" class="form-label">Miktar:</label>
+                    <input type="number" id="quantity" name="quantity" class="form-control" value="1" min="1" max="@Model.Stock" style="width: 100px;" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg">Sepete Ekle</button>
+            </form>
+        }
+        
+        <a asp-action="Index" class="btn btn-secondary mt-3">← Geri Dön</a>
+    </div>
+</div>

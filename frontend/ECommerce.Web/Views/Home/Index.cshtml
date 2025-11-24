@@ -1,0 +1,68 @@
+﻿@model List<ECommerce.Web.Models.Product>
+@{
+    ViewData["Title"] = "Ana Sayfa";
+    var categories = ViewBag.Categories as List<ECommerce.Web.Models.Category> ?? new List<ECommerce.Web.Models.Category>();
+    var selectedCategoryId = ViewBag.SelectedCategoryId as int?;
+    var searchTerm = ViewBag.SearchTerm as string;
+}
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <form asp-action="Index" method="get" class="d-flex gap-2">
+            <input type="text" name="search" class="form-control" placeholder="Ürün ara..." value="@searchTerm">
+            @if (selectedCategoryId.HasValue)
+            {
+                <input type="hidden" name="categoryId" value="@selectedCategoryId.Value">
+            }
+            <button type="submit" class="btn btn-primary">Ara</button>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <h5>Kategoriler</h5>
+        <ul class="list-group mb-4">
+            <li class="list-group-item">
+                <a asp-action="Index" class="text-decoration-none @(selectedCategoryId == null ? "fw-bold" : "")">Tümü</a>
+            </li>
+            @foreach (var category in categories)
+            {
+                <li class="list-group-item">
+                    <a asp-action="Index" asp-route-categoryId="@category.Id" 
+                       class="text-decoration-none @(selectedCategoryId == category.Id ? "fw-bold" : "")">
+                        @category.Name
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+    
+    <div class="col-md-9">
+        @if (Model.Any())
+        {
+            <div class="row">
+                @foreach (var product in Model)
+                {
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">@product.Name</h5>
+                                <p class="text-muted small">@product.CategoryName</p>
+                                <p class="card-text"><strong class="text-primary">@product.Price.ToString("C")</strong></p>
+                                <p class="text-muted small">Stok: @product.Stock</p>
+                                <a asp-action="ProductDetail" asp-route-id="@product.Id" class="btn btn-primary btn-sm w-100">Detay</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                Ürün bulunamadı.
+            </div>
+        }
+    </div>
+</div>

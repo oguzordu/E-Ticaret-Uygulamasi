@@ -1,0 +1,35 @@
+@model List<ECommerce.Web.Models.Product>
+@{
+    ViewData["Title"] = "Ürün Yönetimi";
+}
+
+<h2>Ürün Yönetimi</h2>
+
+<div class="alert alert-info">
+    <strong>Not:</strong> Bu sayfa sadece görüntüleme amaçlıdır. Ürün ekleme, düzenleme ve silme işlemleri API üzerinden yapılmalıdır.
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Ürün Adı</th>
+            <th>Kategori</th>
+            <th>Fiyat</th>
+            <th>Stok</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>@product.Id</td>
+                <td>@product.Name</td>
+                <td>@product.CategoryName</td>
+                <td>@product.Price.ToString("C")</td>
+                <td>@product.Stock</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
