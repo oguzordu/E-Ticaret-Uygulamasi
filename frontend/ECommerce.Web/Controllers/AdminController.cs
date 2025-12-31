@@ -18,6 +18,27 @@ public class AdminController : Controller
         return HttpContext.Session.GetString("IsAdmin") == "True";
     }
 
+    public async Task<IActionResult> Index()
+    {
+        if (!IsAdmin())
+            return Forbid();
+
+        var products = await _apiService.GetProductsAsync() ?? new List<Product>();
+        var orders = await _apiService.GetOrdersAsync() ?? new List<Order>();
+        var categories = await _apiService.GetCategoriesAsync() ?? new List<Category>();
+
+        var model = new AdminDashboardViewModel
+        {
+            TotalProducts = products.Count,
+            TotalOrders = orders.Count,
+            TotalCategories = categories.Count,
+            TotalRevenue = orders.Sum(o => o.TotalAmount),
+            PendingOrders = orders.Count(o => o.Status == "Hazırlanıyor" || o.Status == "Kargoda")
+        };
+
+        return View(model);
+    }
+
     public async Task<IActionResult> Products()
     {
         if (!IsAdmin())
@@ -62,5 +83,23 @@ public class AdminController : Controller
         }
         
         return RedirectToAction("Orders");
+    }
+    [HttpPost]
+    public async Task<IActionResult> UpdateStock(int id, int stock)
+    {
+        if (!IsAdmin())
+            return Forbid();
+
+        var success = await _apiService.UpdateProductStockAsync(id, stock);
+        if (success)
+        {
+            TempData["Success"] = "Stok güncellendi.";
+        }
+        else
+        {
+            TempData["Error"] = "Stok güncellenemedi.";
+        }
+        
+        return RedirectToAction("Products");
     }
 }

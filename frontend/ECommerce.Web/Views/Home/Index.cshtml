@@ -1,68 +1,126 @@
 ﻿@model List<ECommerce.Web.Models.Product>
 @{
     ViewData["Title"] = "Ana Sayfa";
-    var categories = ViewBag.Categories as List<ECommerce.Web.Models.Category> ?? new List<ECommerce.Web.Models.Category>();
-    var selectedCategoryId = ViewBag.SelectedCategoryId as int?;
-    var searchTerm = ViewBag.SearchTerm as string;
+    var categories = ViewBag.Categories as List<ECommerce.Web.Models.Category>;
+    var currentCategory = ViewBag.SelectedCategoryId as int?;
 }
 
-<div class="row mb-3">
-    <div class="col-md-12">
-        <form asp-action="Index" method="get" class="d-flex gap-2">
-            <input type="text" name="search" class="form-control" placeholder="Ürün ara..." value="@searchTerm">
-            @if (selectedCategoryId.HasValue)
-            {
-                <input type="hidden" name="categoryId" value="@selectedCategoryId.Value">
-            }
-            <button type="submit" class="btn btn-primary">Ara</button>
-        </form>
+<!-- HERO SECTION -->
+<div class="container animate-up">
+    <div class="hero-section text-center text-lg-start d-flex align-items-center">
+        <div class="row w-100 align-items-center">
+            <div class="col-lg-6 offset-lg-1">
+                <span class="badge bg-white text-primary rounded-pill px-3 py-2 mb-3 shadow-sm fw-bold tracking-wide">YENİ KOLEKSİYON 2025</span>
+                <h1 class="hero-title fw-bolder">Teknolojiyle <br>Tarzını Yansıt.</h1>
+                <p class="lead text-secondary mb-4" style="max-width: 500px;">Sınırları zorlayan teknoloji ve eşsiz tasarımlar. Şimdi keşfetmeye başlayın.</p>
+                <div class="d-flex gap-3 justify-content-center justify-content-lg-start">
+                    <a href="#products" class="btn btn-primary btn-lg px-5">Alışverişe Başla</a>
+                    <a href="#" class="btn btn-outline-dark btn-lg px-4">Koleksiyonlar</a>
+                </div>
+            </div>
+            <div class="col-lg-4 d-none d-lg-block">
+                 <!-- 3D Icon placeholder concept -->
+                 <div class="bg-white p-5 rounded-circle shadow-xl d-flex align-items-center justify-content-center mx-auto" style="width: 300px; height: 300px;">
+                     <i class="bi bi-watch fs-1 text-primary" style="font-size: 8rem !important;"></i>
+                 </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-3">
-        <h5>Kategoriler</h5>
-        <ul class="list-group mb-4">
-            <li class="list-group-item">
-                <a asp-action="Index" class="text-decoration-none @(selectedCategoryId == null ? "fw-bold" : "")">Tümü</a>
-            </li>
-            @foreach (var category in categories)
-            {
-                <li class="list-group-item">
-                    <a asp-action="Index" asp-route-categoryId="@category.Id" 
-                       class="text-decoration-none @(selectedCategoryId == category.Id ? "fw-bold" : "")">
-                        @category.Name
-                    </a>
-                </li>
-            }
-        </ul>
-    </div>
+<div id="products" class="container animate-up animate-delay-1">
     
-    <div class="col-md-9">
-        @if (Model.Any())
+    <!-- CATEGORY RAIL -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold mb-0">Ürünleri Keşfet</h3>
+    </div>
+
+    <div class="category-rail">
+        <a href="@Url.Action("Index", new { categoryId = (int?)null })" 
+           class="category-pill text-decoration-none @(currentCategory == null ? "active" : "")">
+            Tümü
+        </a>
+        @if (categories != null)
         {
-            <div class="row">
-                @foreach (var product in Model)
-                {
-                    <div class="col-md-4 mb-4">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">@product.Name</h5>
-                                <p class="text-muted small">@product.CategoryName</p>
-                                <p class="card-text"><strong class="text-primary">@product.Price.ToString("C")</strong></p>
-                                <p class="text-muted small">Stok: @product.Stock</p>
-                                <a asp-action="ProductDetail" asp-route-id="@product.Id" class="btn btn-primary btn-sm w-100">Detay</a>
+            foreach (var category in categories)
+            {
+                <a href="@Url.Action("Index", new { categoryId = category.Id })" 
+                   class="category-pill text-decoration-none @(currentCategory == category.Id ? "active" : "")">
+                    @category.Name
+                </a>
+            }
+        }
+    </div>
+
+    <!-- PRODUCT GRID -->
+    <div class="row g-4 mb-5">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var product in Model)
+            {
+                <div class="col-6 col-md-4 col-lg-3">
+                    <a asp-action="ProductDetail" asp-route-id="@product.Id" class="text-decoration-none">
+                        <div class="card card-premium h-100 border-0">
+                            
+                            <!-- Image Container -->
+                            <div class="product-img-container m-3">
+                                @{
+                                    // 1. Try exact name match (handled by img src)
+                                    string exactPath = $"/images/products/{product.Name}.png";
+                                    
+                                    // 2. Prepare fallback based on category/keywords
+                                    string fallbackUrl = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=600";
+                                    
+                                    var pName = product.Name?.ToLower() ?? "";
+                                    var cName = product.CategoryName?.ToLower() ?? "";
+                                    
+                                    if (cName.Contains("telefon") || pName.Contains("telefon")) fallbackUrl = "/images/products/telefon.png";
+                                    else if (cName.Contains("laptop") || pName.Contains("laptop") || cName.Contains("bilgisayar")) fallbackUrl = "/images/products/laptop.png";
+                                    else if (cName.Contains("kulaklık") || pName.Contains("kulaklık")) fallbackUrl = "/images/products/kulaklık.png";
+                                    else if (cName.Contains("ayakkabı") || pName.Contains("ayakkabı") || cName.Contains("ayakkabi") || pName.Contains("ayakkabi")) fallbackUrl = "/images/products/ayakkabi.png";
+                                    else if (cName.Contains("masa") || pName.Contains("masa")) fallbackUrl = "/images/products/masa.png";
+                                    else if (cName.Contains("pantolon") || pName.Contains("pantolon")) fallbackUrl = "/images/products/pantolon.png";
+                                    else if (cName.Contains("tshirt") || pName.Contains("t-shirt") || pName.Contains("tişört") || pName.Contains("tshirt") || cName.Contains("giyim") || pName.Contains("shirt") || pName.Contains("tisort")) fallbackUrl = "/images/products/tshirt.png";
+                                    else if (cName.Contains("yatak") || pName.Contains("yatak")) fallbackUrl = "/images/products/yatak.png";
+                                }
+                                <img src="@exactPath" alt="@product.Name" class="img-fluid rounded-3" 
+                                     onerror="this.onerror=null;this.src='@fallbackUrl';">
+                            </div>
+
+                            <div class="card-body px-4 pb-4 pt-0">
+                                <div class="text-uppercase text-xs fw-bold text-secondary mb-2" style="font-size: 0.75rem; letter-spacing: 0.05em;">@product.CategoryName</div>
+                                <h6 class="card-title fw-bold text-dark mb-3 text-truncate">@product.Name</h6>
+                                <div class="d-flex align-items-center justify-content-between mt-auto">
+                                    <span class="fs-5 fw-bold text-primary">@product.Price.ToString("N2") ₺</span>
+                                    <div class="btn btn-sm btn-primary rounded-circle shadow-sm" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                }
-            </div>
+                    </a>
+                </div>
+            }
         }
         else
         {
-            <div class="alert alert-info">
-                Ürün bulunamadı.
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-search fs-1 text-muted opacity-25 mb-3"></i>
+                <h4 class="text-muted">Aradığınız kriterlere uygun ürün bulunamadı.</h4>
             </div>
         }
     </div>
 </div>
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var selectedCategory = '@currentCategory';
+            if (selectedCategory) {
+                var productsSection = document.getElementById("products");
+                if (productsSection) {
+                    productsSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        });
+    </script>
+}

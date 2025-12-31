@@ -1,0 +1,73 @@
+@{
+    ViewData["Title"] = "Ödeme";
+    Layout = "_Layout";
+}
+
+<div class="row justify-content-center animate-up">
+    <div class="col-lg-6 col-md-8">
+        <div class="card card-premium border-0 shadow-lg mt-5">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-credit-card fs-1"></i>
+                    </div>
+                    <h2 class="fw-bold">Ödeme Bilgileri</h2>
+                    <p class="text-muted">Güvenli ödeme altyapısı ile siparişinizi tamamlayın.</p>
+                </div>
+
+                <form asp-action="CompletePayment" method="post" id="paymentForm">
+                    <div class="mb-4">
+                        <label class="form-label text-secondary text-xs fw-bold text-uppercase ls-1">Kart Üzerindeki İsim</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0"><i class="bi bi-person text-muted"></i></span>
+                            <input type="text" class="form-control bg-light border-0 p-3 fw-medium" placeholder="Ad Soyad" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-secondary text-xs fw-bold text-uppercase ls-1">Kart Numarası</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0"><i class="bi bi-credit-card-2-front text-muted"></i></span>
+                            <input type="text" class="form-control bg-light border-0 p-3 fw-medium" placeholder="0000 0000 0000 0000" maxlength="19" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <label class="form-label text-secondary text-xs fw-bold text-uppercase ls-1">Son Kullanma Tarihi</label>
+                            <input type="text" class="form-control bg-light border-0 p-3 fw-medium" placeholder="AA/YY" maxlength="5" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-secondary text-xs fw-bold text-uppercase ls-1">CVV / CVC</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0"><i class="bi bi-lock text-muted"></i></span>
+                                <input type="text" class="form-control bg-light border-0 p-3 fw-medium" placeholder="123" maxlength="3" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info border-0 bg-info bg-opacity-10 text-info d-flex align-items-center gap-3 mb-4">
+                        <i class="bi bi-shield-lock-fill fs-4"></i>
+                        <small>Bu işlem 256-bit SSL şifreleme ile korunmaktadır. Bu bir demo projesidir, kart bilgileriniz kaydedilmez.</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-lg hvr-scale">
+                        <i class="bi bi-check-lg me-2"></i> Ödemeyi Tamamla
+                    </button>
+                    
+                    <div class="text-center mt-3">
+                         <a asp-action="Index" class="text-muted text-decoration-none small">
+                             <i class="bi bi-arrow-left me-1"></i> Sepete Dön
+                         </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Visa_Inc._logo.svg/200px-Visa_Inc._logo.svg.png" height="20" class="mx-2 opacity-50 grayscale" alt="Visa">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/200px-Mastercard-logo.svg.png" height="20" class="mx-2 opacity-50 grayscale" alt="Mastercard">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/200px-PayPal.svg.png" height="20" class="mx-2 opacity-50 grayscale" alt="PayPal">
+        </div>
+    </div>
+</div>

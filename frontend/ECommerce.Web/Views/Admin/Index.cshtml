@@ -1,0 +1,130 @@
+@model ECommerce.Web.Models.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Yönetim Paneli";
+}
+
+<div class="container animate-up mt-4">
+    <div class="row align-items-center mb-5">
+        <div class="col-md-6">
+            <h1 class="display-6 fw-bold text-dark">Yönetim Paneli</h1>
+            <p class="text-muted">Mağaza performansını ve içeriklerini buradan yönetin.</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                <i class="bi bi-calendar3 me-2 text-primary"></i> @DateTime.Now.ToString("dd MMMM yyyy, dddd")
+            </span>
+        </div>
+    </div>
+
+<div class="row g-4 mb-5">
+    <!-- Quick Stats Mockups -->
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100 bg-primary text-white overflow-hidden position-relative animate-up">
+            <div class="card-body p-4 position-relative z-1">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="bg-white bg-opacity-25 rounded p-2">
+                        <i class="bi bi-box-seam fs-4"></i>
+                    </div>
+                </div>
+                <h2 class="display-5 fw-bold mb-1">@Model.TotalProducts</h2>
+                <p class="opacity-75 mb-0">Toplam Ürün</p>
+                <a asp-action="Products" class="stretched-link"></a>
+            </div>
+            <div class="position-absolute top-0 end-0 p-4 opacity-10">
+                <i class="bi bi-box-seam" style="font-size: 8rem;"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+         <div class="card border-0 shadow-sm h-100 bg-success text-white overflow-hidden position-relative animate-up" style="animation-delay: 0.1s">
+            <div class="card-body p-4 position-relative z-1">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                     <div class="bg-white bg-opacity-25 rounded p-2">
+                        <i class="bi bi-basket3 fs-4"></i>
+                    </div>
+                </div>
+                <h2 class="display-5 fw-bold mb-1">@Model.TotalOrders</h2>
+                <p class="opacity-75 mb-0">Toplam Sipariş</p>
+                 <a asp-action="Orders" class="stretched-link"></a>
+            </div>
+             <div class="position-absolute top-0 end-0 p-4 opacity-10">
+                <i class="bi bi-basket3" style="font-size: 8rem;"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+         <div class="card border-0 shadow-sm h-100 bg-info text-white overflow-hidden position-relative animate-up" style="animation-delay: 0.2s">
+            <div class="card-body p-4 position-relative z-1">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                     <div class="bg-white bg-opacity-25 rounded p-2">
+                        <i class="bi bi-tags fs-4"></i>
+                    </div>
+                </div>
+                <h2 class="display-5 fw-bold mb-1">@Model.TotalCategories</h2>
+                <p class="opacity-75 mb-0">Kategori</p>
+                 <a asp-action="Categories" class="stretched-link"></a>
+            </div>
+            <div class="position-absolute top-0 end-0 p-4 opacity-10">
+                <i class="bi bi-tags" style="font-size: 8rem;"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+         <div class="card border-0 shadow-sm h-100 bg-warning text-white overflow-hidden position-relative animate-up" style="animation-delay: 0.3s">
+            <div class="card-body p-4 position-relative z-1">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                     <div class="bg-white bg-opacity-25 rounded p-2">
+                        <i class="bi bi-wallet2 fs-4"></i>
+                    </div>
+                </div>
+                <h2 class="display-6 fw-bold mb-1">@Model.TotalRevenue.ToString("N0") ₺</h2>
+                <p class="opacity-75 mb-0">Toplam Ciro</p>
+            </div>
+            <div class="position-absolute top-0 end-0 p-4 opacity-10">
+                <i class="bi bi-wallet2" style="font-size: 8rem;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3 class="h5 fw-bold mb-4 text-dark">Hızlı İşlemler</h3>
+<div class="row g-3">
+    <div class="col-md-6 col-lg-3">
+        <a asp-action="Products" class="card card-body border-0 shadow-sm h-100 text-decoration-none hover-scale">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle">
+                    <i class="bi bi-plus-lg"></i>
+                </div>
+                <div>
+                     <h6 class="mb-1 text-dark fw-bold">Ürün Ekle</h6>
+                     <small class="text-muted">Kataloğa yeni ürün</small>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-6 col-lg-3">
+         <a asp-action="Orders" class="card card-body border-0 shadow-sm h-100 text-decoration-none hover-scale">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-circle">
+                    <i class="bi bi-truck"></i>
+                </div>
+                <div>
+                     <h6 class="mb-1 text-dark fw-bold">Bekleyen Siparişler</h6>
+                     <small class="text-muted">Kargo işlemleri</small>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<style>
+    .hover-scale {
+        transition: transform 0.2s;
+    }
+    .hover-scale:hover {
+        transform: translateY(-5px);
+    }
+</style>

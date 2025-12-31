@@ -21,7 +21,6 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(builder);
 
-        // Users Tablosu - Minimal
         builder.Entity<ApplicationUser>(entity =>
         {
             entity.ToTable("Users");
@@ -32,12 +31,10 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.PasswordHash).IsRequired().HasColumnName("PasswordHash");
             entity.Property(e => e.IsAdmin).HasColumnName("IsAdmin");
             
-            // Index'ler
             entity.HasIndex(e => e.Email).IsUnique().HasDatabaseName("IX_Users_Email");
             entity.HasIndex(e => e.Username).IsUnique().HasDatabaseName("IX_Users_Username");
         });
 
-        // Categories Tablosu - Minimal
         builder.Entity<Category>(entity =>
         {
             entity.ToTable("Categories");
@@ -46,7 +43,6 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100).HasColumnName("CategoryName");
         });
 
-        // Products Tablosu - Minimal
         builder.Entity<Product>(entity =>
         {
             entity.ToTable("Products");
@@ -62,7 +58,6 @@ public class ApplicationDbContext : DbContext
                   .OnDelete(DeleteBehavior.Restrict);
         });
 
-        // CartItems Tablosu - Minimal
         builder.Entity<CartItem>(entity =>
         {
             entity.ToTable("CartItems");
@@ -81,7 +76,6 @@ public class ApplicationDbContext : DbContext
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // Orders Tablosu - Minimal
         builder.Entity<Order>(entity =>
         {
             entity.ToTable("Orders");
@@ -97,7 +91,6 @@ public class ApplicationDbContext : DbContext
                   .OnDelete(DeleteBehavior.Restrict);
         });
 
-        // OrderItems Tablosu
         builder.Entity<OrderItem>(entity =>
         {
             entity.ToTable("OrderItems");

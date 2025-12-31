@@ -3,53 +3,112 @@
     ViewData["Title"] = "Siparişlerim";
 }
 
-<h2>Siparişlerim</h2>
+<div class="container animate-up mt-4 mb-5">
+    <h1 class="display-6 fw-bold mb-4">Siparişlerim</h1>
 
-@if (Model.Any())
-{
-    @foreach (var order in Model)
+    @if (Model != null && Model.Any())
     {
-        <div class="card mb-3">
-            <div class="card-header d-flex justify-content-between">
-                <div>
-                    <strong>Sipariş #@order.Id</strong> - @order.OrderDate.ToString("dd.MM.yyyy HH:mm")
+        <div class="row g-4">
+            @foreach (var order in Model.OrderByDescending(o => o.OrderDate))
+            {
+                <div class="col-12">
+                    <div class="card card-premium border-0 shadow-lg overflow-hidden">
+                        <div class="card-header bg-white border-bottom border-light p-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+                            <div class="d-flex align-items-center gap-4">
+                                <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-3 text-center" style="min-width: 90px;">
+                                    <div class="small fw-bold text-uppercase tracking-wider opacity-75">Sipariş</div>
+                                    <div class="fs-4 fw-bold">#@order.Id</div>
+                                </div>
+                                <div>
+                                    <div class="text-secondary small mb-1"><i class="bi bi-calendar3 me-1"></i> @order.OrderDate.ToString("dd MMMM yyyy HH:mm")</div>
+                                    <div class="fw-bold text-dark fs-5">
+                                        @order.OrderItems.Sum(x => x.Quantity) Ürün
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex align-items-center gap-3">
+                                @if(order.Status == "Teslim Edildi") {
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill d-flex align-items-center gap-2">
+                                        <i class="bi bi-check-circle-fill"></i> @order.Status
+                                    </span>
+                                } else if(order.Status == "Kargoda") {
+                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill d-flex align-items-center gap-2">
+                                        <i class="bi bi-truck"></i> @order.Status
+                                    </span>
+                                } else {
+                                     <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-2 rounded-pill d-flex align-items-center gap-2">
+                                        <i class="bi bi-clock-history"></i> @order.Status
+                                    </span>
+                                }
+                                <div class="text-end ms-3">
+                                    <div class="small text-muted">Toplam Tutar</div>
+                                    <div class="fs-4 fw-bold text-primary">@order.TotalAmount.ToString("N2") ₺</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0 align-middle">
+                                    <thead class="bg-light small text-secondary text-uppercase tracking-wider">
+                                        <tr>
+                                            <th class="ps-5 py-3 w-50" style="font-weight: 600;">Ürün Detayları</th>
+                                            <th class="text-center py-3" style="font-weight: 600;">Adet</th>
+                                            <th class="text-end pe-5 py-3" style="font-weight: 600;">Fiyat</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in order.OrderItems)
+                                        {
+                                            <tr>
+                                                <td class="ps-5 py-3">
+                                                    <div class="d-flex align-items-center gap-3">
+                                                         <div class="bg-white border rounded p-1 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                             @{
+                                                                 string exactPath = $"/images/products/{item.Product.Name}.png";
+                                                                 string fallbackUrl = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=150";
+                                                                 
+                                                                 var pName = item.Product.Name?.ToLower() ?? "";
+                                                                 var cName = item.Product.CategoryName?.ToLower() ?? "";
+                                                                 
+                                                                 if (cName.Contains("telefon") || pName.Contains("telefon")) fallbackUrl = "/images/products/telefon.png";
+                                                                 else if (cName.Contains("laptop") || pName.Contains("laptop") || cName.Contains("bilgisayar")) fallbackUrl = "/images/products/laptop.png";
+                                                                 else if (cName.Contains("kulaklık") || pName.Contains("kulaklık")) fallbackUrl = "/images/products/kulaklık.png";
+                                                                 else if (cName.Contains("ayakkabı") || pName.Contains("ayakkabı") || cName.Contains("ayakkabi") || pName.Contains("ayakkabi")) fallbackUrl = "/images/products/ayakkabi.png";
+                                                                 else if (cName.Contains("masa") || pName.Contains("masa")) fallbackUrl = "/images/products/masa.png";
+                                                                 else if (cName.Contains("pantolon") || pName.Contains("pantolon")) fallbackUrl = "/images/products/pantolon.png";
+                                                                 else if (cName.Contains("tshirt") || pName.Contains("t-shirt") || pName.Contains("tişört") || pName.Contains("tshirt") || cName.Contains("giyim") || pName.Contains("shirt") || pName.Contains("tisort")) fallbackUrl = "/images/products/tshirt.png";
+                                                                 else if (cName.Contains("yatak") || pName.Contains("yatak")) fallbackUrl = "/images/products/yatak.png";
+                                                             }
+                                                             <img src="@exactPath" alt="@item.Product.Name" class="img-fluid" style="max-height: 100%; max-width: 100%;"
+                                                                  onerror="this.onerror=null;this.src='@fallbackUrl';">
+                                                         </div>
+                                                         <span class="fw-bold text-dark">@item.Product.Name</span>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center text-muted">x @item.Quantity</td>
+                                                <td class="text-end pe-5 fw-bold text-dark">@((item.Price * item.Quantity).ToString("N2") + " ₺")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <span class="badge bg-info">@order.Status</span>
-                </div>
-            </div>
-            <div class="card-body">
-                <table class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th>Ürün</th>
-                            <th>Miktar</th>
-                            <th>Birim Fiyat</th>
-                            <th>Toplam</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in order.OrderItems)
-                        {
-                            <tr>
-                                <td>@item.Product.Name</td>
-                                <td>@item.Quantity</td>
-                                <td>@item.Price.ToString("C")</td>
-                                <td>@((item.Price * item.Quantity).ToString("C"))</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-                <div class="text-end mt-3">
-                    <strong>Toplam: @order.TotalAmount.ToString("C")</strong>
-                </div>
-            </div>
+            }
         </div>
     }
-}
-else
-{
-    <div class="alert alert-info">
-        Henüz siparişiniz yok. <a asp-controller="Home" asp-action="Index">Alışverişe başlayın</a>
-    </div>
-}
+    else
+    {
+        <div class="text-center py-5 opacity-50">
+            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 120px; height: 120px;">
+                <i class="bi bi-box2 fs-1 text-muted"></i>
+            </div>
+            <h3 class="fw-bold text-dark">Henüz siparişiniz yok.</h3>
+            <p class="text-muted mb-4">Siparişleriniz burada listelenecektir.</p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary px-5 py-3 rounded-pill shadow-lg">Alışverişe Başla</a>
+        </div>
+    }
+</div>

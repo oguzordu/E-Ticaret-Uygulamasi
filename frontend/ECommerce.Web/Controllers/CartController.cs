@@ -15,8 +15,20 @@ public class CartController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var cartItems = await _apiService.GetCartAsync() ?? new List<CartItem>();
-        return View(cartItems);
+        if (string.IsNullOrEmpty(HttpContext.Session.GetString("Token")))
+        {
+            return RedirectToAction("Login", "Auth");
+        }
+        
+        try
+        {
+            var cartItems = await _apiService.GetCartAsync() ?? new List<CartItem>();
+            return View(cartItems);
+        }
+        catch
+        {
+            return RedirectToAction("Login", "Auth"); // Fallback if API fails (e.g., 401)
+        }
     }
 
     [HttpPost]
@@ -41,6 +53,7 @@ public class CartController : Controller
     public async Task<IActionResult> UpdateQuantity(int id, int quantity)
     {
         var success = await _apiService.UpdateCartItemAsync(id, quantity);
+        if (!success) TempData["Error"] = "Miktar güncellenemedi";
         return RedirectToAction("Index");
     }
 
@@ -48,6 +61,34 @@ public class CartController : Controller
     public async Task<IActionResult> Remove(int id)
     {
         await _apiService.RemoveFromCartAsync(id);
+        return RedirectToAction("Index");
+    }
+
+    public IActionResult Checkout()
+    {
+        if (string.IsNullOrEmpty(HttpContext.Session.GetString("Token")))
+        {
+            return RedirectToAction("Login", "Auth");
+        }
+        return View("Payment");
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CompletePayment()
+    {
+        if (string.IsNullOrEmpty(HttpContext.Session.GetString("Token")))
+        {
+            return RedirectToAction("Login", "Auth");
+        }
+
+        var order = await _apiService.CreateOrderAsync();
+        if (order != null)
+        {
+            TempData["Success"] = "Siparişiniz alındı! Teşekkür ederiz.";
+            return RedirectToAction("Index", "Orders");
+        }
+        
+        TempData["Error"] = "Ödeme sırasında bir hata oluştu veya sepetiniz boş.";
         return RedirectToAction("Index");
     }
 }

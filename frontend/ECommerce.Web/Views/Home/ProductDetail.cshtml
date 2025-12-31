@@ -1,33 +1,105 @@
 @model ECommerce.Web.Models.Product
 @{
     ViewData["Title"] = Model.Name;
+    
+    string imgUrl = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=1000"; 
+    var catName = Model.CategoryName?.ToLower() ?? "";
+    if (catName.Contains("telefon")) imgUrl = "https://images.unsplash.com/photo-1596558450268-9c27524ba856?auto=format&fit=crop&q=80&w=1000";
+    else if (catName.Contains("bilgisayar") || catName.Contains("laptop")) imgUrl = "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&q=80&w=1000";
+    else if (catName.Contains("kulaklık")) imgUrl = "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=1000";
+    else if (catName.Contains("kamera")) imgUrl = "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=1000";
+    else if (catName.Contains("ayakkabı")) imgUrl = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=1000";
 }
 
-<div class="row">
-    <div class="col-md-8">
-        <h2>@Model.Name</h2>
-        <p class="text-muted">@Model.CategoryName</p>
-        <h3 class="text-primary mb-4">@Model.Price.ToString("C")</h3>
-        <p><strong>Stok:</strong> @Model.Stock adet</p>
-        
-        @if (string.IsNullOrEmpty(Context.Session.GetString("Token")))
-        {
-            <div class="alert alert-warning">
-                Sepete eklemek için <a asp-controller="Auth" asp-action="Login">giriş yapın</a>.
+<div class="container animate-up mt-5 mb-5">
+    <div class="row gx-5">
+        <!-- Sticky Image Gallery -->
+        <div class="col-lg-7 mb-4 mb-lg-0">
+            <div class="product-img-container rounded-4 shadow-sm bg-white p-5 border" style="aspect-ratio: 4/3;">
+                 @{
+                     string exactPath = $"/images/products/{Model.Name}.png";
+                     string fallbackUrl = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=1000";
+                     
+                     var pName = Model.Name?.ToLower() ?? "";
+                     var cName = Model.CategoryName?.ToLower() ?? "";
+                     
+                     if (cName.Contains("telefon") || pName.Contains("telefon")) fallbackUrl = "/images/products/telefon.png";
+                     else if (cName.Contains("laptop") || pName.Contains("laptop") || cName.Contains("bilgisayar")) fallbackUrl = "/images/products/laptop.png";
+                     else if (cName.Contains("kulaklık") || pName.Contains("kulaklık")) fallbackUrl = "/images/products/kulaklık.png";
+                     else if (cName.Contains("ayakkabı") || pName.Contains("ayakkabı") || cName.Contains("ayakkabi") || pName.Contains("ayakkabi")) fallbackUrl = "/images/products/ayakkabi.png";
+                     else if (cName.Contains("masa") || pName.Contains("masa")) fallbackUrl = "/images/products/masa.png";
+                     else if (cName.Contains("pantolon") || pName.Contains("pantolon")) fallbackUrl = "/images/products/pantolon.png";
+                     else if (cName.Contains("tshirt") || pName.Contains("t-shirt") || pName.Contains("tişört") || pName.Contains("tshirt") || cName.Contains("giyim") || pName.Contains("shirt") || pName.Contains("tisort")) fallbackUrl = "/images/products/tshirt.png";
+                     else if (cName.Contains("yatak") || pName.Contains("yatak")) fallbackUrl = "/images/products/yatak.png";
+                 }
+                 <img src="@exactPath" alt="@Model.Name" class="img-fluid" style="height: 100%; object-fit: contain;"
+                      onerror="this.onerror=null;this.src='@fallbackUrl';">
             </div>
-        }
-        else
-        {
-            <form asp-controller="Cart" asp-action="AddToCart" method="post" class="mt-4">
-                <input type="hidden" name="productId" value="@Model.Id">
-                <div class="mb-3">
-                    <label for="quantity" class="form-label">Miktar:</label>
-                    <input type="number" id="quantity" name="quantity" class="form-control" value="1" min="1" max="@Model.Stock" style="width: 100px;" required>
+        </div>
+
+        <!-- Product Details -->
+        <div class="col-lg-5">
+            <div class="d-flex flex-column h-100 justify-content-center ps-lg-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb small text-uppercase fw-bold text-secondary mb-3">
+                        <li class="breadcrumb-item"><a href="javascript:history.back()" class="text-decoration-none text-muted">Geri</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">@Model.CategoryName</li>
+                    </ol>
+                </nav>
+
+                <h1 class="display-5 fw-bold mb-3 text-primary">@Model.Name</h1>
+                
+                <div class="d-flex align-items-center gap-3 mb-4">
+                     <h2 class="display-6 fw-bold text-dark mb-0">@Model.Price.ToString("N2") ₺</h2>
+                     @if(Model.Stock > 0) {
+                         <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2">Stokta Var</span>
+                     } else {
+                         <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2">Tükendi</span>
+                     }
                 </div>
-                <button type="submit" class="btn btn-primary btn-lg">Sepete Ekle</button>
-            </form>
-        }
-        
-        <a asp-action="Index" class="btn btn-secondary mt-3">← Geri Dön</a>
+
+                <p class="text-secondary lead mb-5">
+                    Bu ürün, kategorisinin en sevilen parçalarından biri. Üstün performans ve şık tasarımı bir araya getiriyor. 
+                    StorePro güvencesiyle hemen sipariş verin.
+                </p>
+
+                <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                    <input type="hidden" name="productId" value="@Model.Id" />
+                    
+                    <div class="mb-4">
+                        <label class="small fw-bold text-secondary mb-2 d-block">ADET</label>
+                         <div class="bg-white border rounded-pill d-inline-flex align-items-center px-2 py-1">
+                             <button type="button" class="btn btn-sm rounded-circle" onclick="this.nextElementSibling.stepDown()"><i class="bi bi-dash"></i></button>
+                             <input type="number" name="quantity" class="form-control border-0 text-center fw-bold bg-transparent" value="1" min="1" max="@Model.Stock" style="width: 50px; appearance: textfield;">
+                             <button type="button" class="btn btn-sm rounded-circle" onclick="this.previousElementSibling.stepUp()"><i class="bi bi-plus"></i></button>
+                         </div>
+                    </div>
+
+                    <div class="d-grid gap-3">
+                        <button type="submit" class="btn btn-primary btn-lg shadow-lg @(Model.Stock == 0 ? "disabled" : "")">
+                            @(Model.Stock == 0 ? "STOKTA YOK" : "SEPETE EKLE")
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="mt-5 pt-4 border-top">
+                    <div class="row text-center g-3">
+                        <div class="col-4">
+                            <i class="bi bi-truck fs-3 text-primary mb-2 d-block"></i>
+                            <span class="small fw-bold text-secondary">Hızlı Kargo</span>
+                        </div>
+                        <div class="col-4">
+                            <i class="bi bi-shield-check fs-3 text-primary mb-2 d-block"></i>
+                            <span class="small fw-bold text-secondary">Güvenli Ödeme</span>
+                        </div>
+                        <div class="col-4">
+                            <i class="bi bi-arrow-counterclockwise fs-3 text-primary mb-2 d-block"></i>
+                            <span class="small fw-bold text-secondary">İade Garantisi</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
 </div>

@@ -3,33 +3,92 @@
     ViewData["Title"] = "Ürün Yönetimi";
 }
 
-<h2>Ürün Yönetimi</h2>
+<div class="container animate-up mt-4">
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="h3 fw-bold mb-0">Ürün Yönetimi</h1>
+            <p class="text-muted small mb-0">Sistemdeki tüm ürünlerin listesi</p>
+        </div>
+    </div>
 
-<div class="alert alert-info">
-    <strong>Not:</strong> Bu sayfa sadece görüntüleme amaçlıdır. Ürün ekleme, düzenleme ve silme işlemleri API üzerinden yapılmalıdır.
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white py-3 border-0">
+        <div class="alert alert-info border-0 bg-info-subtle text-info-emphasis d-flex align-items-center mb-0">
+            <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+            <div>
+                <strong>Bilgi:</strong> Ürün ekleme, düzenleme ve silme işlemleri için lütfen API endpoints kullanın.
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3 border-0">ID</th>
+                        <th class="py-3 border-0">Ürün Adı</th>
+                        <th class="py-3 border-0">Kategori</th>
+                        <th class="py-3 border-0">Fiyat</th>
+                        <th class="py-3 border-0">Stok</th>
+                        <th class="pe-4 py-3 border-0 text-end">Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model)
+                    {
+                        <tr>
+                            <td class="ps-4 text-muted small">#@product.Id</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-white border rounded p-1 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                         @{
+                                             string exactPath = $"/images/products/{product.Name}.png";
+                                             string fallbackUrl = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=150";
+                                             
+                                             var pName = product.Name?.ToLower() ?? "";
+                                             var cName = product.CategoryName?.ToLower() ?? "";
+                                             
+                                             if (cName.Contains("telefon") || pName.Contains("telefon")) fallbackUrl = "/images/products/telefon.png";
+                                             else if (cName.Contains("laptop") || pName.Contains("laptop") || cName.Contains("bilgisayar")) fallbackUrl = "/images/products/laptop.png";
+                                             else if (cName.Contains("kulaklık") || pName.Contains("kulaklık")) fallbackUrl = "/images/products/kulaklık.png";
+                                             else if (cName.Contains("ayakkabı") || pName.Contains("ayakkabı") || cName.Contains("ayakkabi") || pName.Contains("ayakkabi")) fallbackUrl = "/images/products/ayakkabi.png";
+                                             else if (cName.Contains("masa") || pName.Contains("masa")) fallbackUrl = "/images/products/masa.png";
+                                             else if (cName.Contains("pantolon") || pName.Contains("pantolon")) fallbackUrl = "/images/products/pantolon.png";
+                                             else if (cName.Contains("tshirt") || pName.Contains("t-shirt") || pName.Contains("tişört") || pName.Contains("tshirt") || cName.Contains("giyim") || pName.Contains("shirt") || pName.Contains("tisort")) fallbackUrl = "/images/products/tshirt.png";
+                                             else if (cName.Contains("yatak") || pName.Contains("yatak")) fallbackUrl = "/images/products/yatak.png";
+                                         }
+                                         <img src="@exactPath" alt="@product.Name" class="img-fluid" style="max-height: 100%;"
+                                              onerror="this.onerror=null;this.src='@fallbackUrl';">
+                                    </div>
+                                    <span class="fw-medium">@product.Name</span>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-light text-dark border">@product.CategoryName</span></td>
+                            <td class="fw-bold text-primary">@product.Price.ToString("C")</td>
+                            <td>
+                                <form asp-action="UpdateStock" method="post" class="d-flex align-items-center gap-2">
+                                    <input type="hidden" name="id" value="@product.Id" />
+                                    <input type="number" name="stock" value="@product.Stock" class="form-control form-control-sm border-secondary bg-white fw-bold text-center product-stock-input" style="width: 80px;" min="0" />
+                                    <button type="submit" class="btn btn-sm btn-dark rounded-pill px-3 shadow-sm d-flex align-items-center gap-2">
+                                        <span>Güncelle</span>
+                                    </button>
+                                </form>
+                            </td>
+                            <td class="pe-4 text-end">
+                                @if (product.Stock > 0)
+                                {
+                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill">Aktif</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill">Pasif</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
-
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Ürün Adı</th>
-            <th>Kategori</th>
-            <th>Fiyat</th>
-            <th>Stok</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var product in Model)
-        {
-            <tr>
-                <td>@product.Id</td>
-                <td>@product.Name</td>
-                <td>@product.CategoryName</td>
-                <td>@product.Price.ToString("C")</td>
-                <td>@product.Stock</td>
-            </tr>
-        }
-    </tbody>
-</table>
 

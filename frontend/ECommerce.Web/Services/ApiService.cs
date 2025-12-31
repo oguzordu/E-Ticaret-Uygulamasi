@@ -87,6 +87,12 @@ public class ApiService
             return null;
         }
     }
+    public async Task<bool> UpdateProductStockAsync(int id, int stock)
+    {
+        SetAuthHeader();
+        var response = await _httpClient.PatchAsJsonAsync($"{ApiBaseUrl}/Products/{id}/stock", new { stock = stock });
+        return response.IsSuccessStatusCode;
+    }
 
     // Categories
     public async Task<List<Category>?> GetCategoriesAsync()
@@ -105,21 +111,14 @@ public class ApiService
     public async Task<bool> AddToCartAsync(int productId, int quantity)
     {
         SetAuthHeader();
-        var response = await _httpClient.PostAsJsonAsync($"{ApiBaseUrl}/Cart/add", new
-        {
-            ProductId = productId,
-            Quantity = quantity
-        });
+        var response = await _httpClient.PostAsJsonAsync($"{ApiBaseUrl}/Cart/add", new { productId, quantity });
         return response.IsSuccessStatusCode;
     }
 
     public async Task<bool> UpdateCartItemAsync(int id, int quantity)
     {
         SetAuthHeader();
-        var response = await _httpClient.PutAsJsonAsync($"{ApiBaseUrl}/Cart/{id}", new
-        {
-            Quantity = quantity
-        });
+        var response = await _httpClient.PutAsJsonAsync($"{ApiBaseUrl}/Cart/{id}", new { quantity });
         return response.IsSuccessStatusCode;
     }
 

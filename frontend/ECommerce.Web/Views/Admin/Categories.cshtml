@@ -3,27 +3,38 @@
     ViewData["Title"] = "Kategori Yönetimi";
 }
 
-<h2>Kategori Yönetimi</h2>
-
-<div class="alert alert-info">
-    <strong>Not:</strong> Bu sayfa sadece görüntüleme amaçlıdır. Kategori ekleme, düzenleme ve silme işlemleri API üzerinden yapılmalıdır.
+<div class="row mb-4 align-items-center">
+    <div class="col">
+        <h1 class="h3 fw-bold mb-0">Kategori Yönetimi</h1>
+        <p class="text-muted small mb-0">Ürün kategorilerini listeleyin</p>
+    </div>
 </div>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Kategori Adı</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var category in Model)
-        {
-            <tr>
-                <td>@category.Id</td>
-                <td>@category.Name</td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="row">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+             <div class="card-header bg-white py-3 border-0">
+                <div class="alert alert-info border-0 bg-info-subtle text-info-emphasis d-flex align-items-center mb-0">
+                    <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                    <div>
+                        <strong>Bilgi:</strong> Kategori işlemleri API üzerinden yönetilmektedir.
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    @foreach (var category in Model)
+                    {
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-4 py-3">
+                            <span class="fw-medium">
+                                <i class="bi bi-folder2-open me-2 text-warning"></i> @category.Name
+                            </span>
+                            <span class="badge bg-light text-muted border rounded-pill">ID: @category.Id</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 

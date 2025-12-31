@@ -1,72 +1,106 @@
 @model List<ECommerce.Web.Models.CartItem>
 @{
     ViewData["Title"] = "Sepetim";
+    decimal total = Model?.Sum(x => (x.Product?.Price ?? 0) * x.Quantity) ?? 0;
 }
 
-<h2>Sepetim</h2>
+<div class="animate-in">
+    <h1 class="display-6 fw-bold mb-4">Alışveriş Sepeti (@(Model?.Sum(x => x.Quantity) ?? 0) Ürün)</h1>
 
-@if (Model.Any())
-{
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Ürün</th>
-                <th>Fiyat</th>
-                <th>Miktar</th>
-                <th>Toplam</th>
-                <th>İşlemler</th>
-            </tr>
-        </thead>
-        <tbody>
-            @{
-                decimal total = 0;
-            }
-            @foreach (var item in Model)
-            {
-                var itemTotal = item.Product.Price * item.Quantity;
-                total += itemTotal;
-                <tr>
-                    <td>
-                        <strong>@item.Product.Name</strong><br>
-                        <small class="text-muted">@item.Product.CategoryName</small>
-                    </td>
-                    <td>@item.Product.Price.ToString("C")</td>
-                    <td>
-                        <form asp-action="UpdateQuantity" method="post" class="d-inline">
-                            <input type="hidden" name="id" value="@item.Id">
-                            <input type="number" name="quantity" value="@item.Quantity" min="1" max="@item.Product.Stock" 
-                                   class="form-control form-control-sm d-inline" style="width: 80px;" 
-                                   onchange="this.form.submit()">
-                        </form>
-                    </td>
-                    <td>@itemTotal.ToString("C")</td>
-                    <td>
-                        <form asp-action="Remove" method="post" class="d-inline">
-                            <input type="hidden" name="id" value="@item.Id">
-                            <button type="submit" class="btn btn-danger btn-sm">Kaldır</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-        <tfoot>
-            <tr>
-                <th colspan="3" class="text-end">Toplam:</th>
-                <th>@total.ToString("C")</th>
-                <th></th>
-            </tr>
-        </tfoot>
-    </table>
-    
-    <div class="mt-4">
-        <form asp-controller="Orders" asp-action="Create" method="post">
-            <button type="submit" class="btn btn-success btn-lg">Siparişi Tamamla</button>
-        </form>
-    </div>
-}
-else
-{
-    <div class="alert alert-info">
-        Sepetiniz boş. <a asp-controller="Home" asp-action="Index">Alışverişe başlayın</a>
-    </div>
-}
+    @if (Model != null && Model.Any())
+    {
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="d-flex flex-column gap-3">
+                    @foreach (var item in Model)
+                    {
+                        var productName = item.Product?.Name ?? item.ProductName ?? "Bilinmeyen Ürün"; 
+                        var price = item.Product?.Price ?? item.Price;
+                        var categoryName = item.Product?.CategoryName ?? item.CategoryName ?? "";
+
+                        <div class="card border-0 shadow-sm p-3">
+                            <div class="d-flex align-items-center gap-4">
+                                <!-- Image -->
+                                <div class="bg-white border rounded d-flex align-items-center justify-content-center overflow-hidden" style="width: 80px; height: 80px; flex-shrink: 0;">
+                                    @{
+                                        string exactPath = $"/images/products/{productName}.png";
+                                        string fallbackUrl = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=150";
+                                        
+                                        var pName = productName.ToLower();
+                                        var cName = categoryName.ToLower(); 
+                                        
+                                        if (cName.Contains("telefon") || pName.Contains("telefon")) fallbackUrl = "/images/products/telefon.png";
+                                        else if (cName.Contains("laptop") || pName.Contains("laptop") || cName.Contains("bilgisayar")) fallbackUrl = "/images/products/laptop.png";
+                                        else if (cName.Contains("kulaklık") || pName.Contains("kulaklık")) fallbackUrl = "/images/products/kulaklık.png";
+                                        else if (cName.Contains("ayakkabı") || pName.Contains("ayakkabı") || cName.Contains("ayakkabi") || pName.Contains("ayakkabi")) fallbackUrl = "/images/products/ayakkabi.png";
+                                        else if (cName.Contains("masa") || pName.Contains("masa")) fallbackUrl = "/images/products/masa.png";
+                                        else if (cName.Contains("pantolon") || pName.Contains("pantolon")) fallbackUrl = "/images/products/pantolon.png";
+                                        else if (cName.Contains("tshirt") || pName.Contains("t-shirt") || pName.Contains("tişört") || pName.Contains("tshirt") || cName.Contains("giyim") || pName.Contains("shirt") || pName.Contains("tisort")) fallbackUrl = "/images/products/tshirt.png";
+                                        else if (cName.Contains("yatak") || pName.Contains("yatak")) fallbackUrl = "/images/products/yatak.png";
+                                    }
+                                    <img src="@exactPath" alt="@productName" class="img-fluid" style="max-height: 100%; max-width: 100%;"
+                                         onerror="this.onerror=null;this.src='@fallbackUrl';">
+                                </div>
+                                
+                                <div class="flex-grow-1">
+                                    <h5 class="fw-bold mb-1">@productName</h5>
+                                    <p class="text-muted small mb-0">Birim Fiyat: @price.ToString("N2") ₺</p>
+                                </div>
+                                
+                                <div class="d-flex align-items-center gap-3">
+                                    <form asp-action="UpdateQuantity" method="post" class="d-flex align-items-center bg-light rounded px-2">
+                                        <input type="hidden" name="id" value="@item.Id">
+                                        <button type="submit" name="quantity" value="@(item.Quantity - 1)" class="btn btn-sm text-secondary p-1"><i class="bi bi-dash"></i></button>
+                                        <span class="mx-2 fw-bold">@item.Quantity</span>
+                                        <button type="submit" name="quantity" value="@(item.Quantity + 1)" class="btn btn-sm text-secondary p-1"><i class="bi bi-plus"></i></button>
+                                    </form>
+                                    
+                                    <form asp-action="Remove" method="post">
+                                        <input type="hidden" name="id" value="@item.Id">
+                                        <button type="submit" class="btn btn-light btn-sm text-danger rounded-circle" title="Sil">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                                
+                                <div class="text-end fw-bold fs-5" style="min-width: 100px;">
+                                    @((price * item.Quantity).ToString("N2")) ₺
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm p-4 sticky-top" style="top: 100px;">
+                    <h5 class="fw-bold mb-4">Sipariş Özeti</h5>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Ara Toplam</span>
+                        <span class="fw-medium">@total.ToString("N2") ₺</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="text-muted">Kargo</span>
+                        <span class="text-success fw-medium">Ücretsiz</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="fw-bold fs-5">Genel Toplam</span>
+                        <span class="fw-bold fs-4 text-primary">@total.ToString("N2") ₺</span>
+                    </div>
+                    <a asp-controller="Cart" asp-action="Checkout" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm">
+                        Ödemeye Geç <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5 opacity-50">
+            <i class="bi bi-cart-x fs-1 mb-3 d-block"></i>
+            <h3 class="fw-normal">Sepetiniz boş</h3>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-3">Alışverişe Başla</a>
+        </div>
+    }
+</div>
