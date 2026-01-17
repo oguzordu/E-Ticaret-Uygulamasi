@@ -8,5 +8,6 @@ public class Product
     public int Stock { get; set; }
     public int CategoryId { get; set; }
     public string CategoryName { get; set; } = string.Empty;
+    public bool IsFavorite { get; set; }
 }
 

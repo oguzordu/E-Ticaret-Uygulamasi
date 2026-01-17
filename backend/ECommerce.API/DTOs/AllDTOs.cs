@@ -32,6 +32,7 @@ public class ProductDto
     public int Stock { get; set; }
     public int CategoryId { get; set; }
     public string CategoryName { get; set; } = string.Empty;
+    public bool IsFavorite { get; set; }
 }
 
 public class CategoryDto
@@ -85,4 +86,16 @@ public class UpdateCartItemDto
 public class UpdateOrderStatusDto
 {
     public string Status { get; set; } = string.Empty;
+}
+
+public class FavoriteDto
+{
+    public int Id { get; set; }
+    public int ProductId { get; set; }
+    public ProductDto Product { get; set; } = null!;
+}
+
+public class UserSettingsDto
+{
+    public bool DarkModeEnabled { get; set; }
 }

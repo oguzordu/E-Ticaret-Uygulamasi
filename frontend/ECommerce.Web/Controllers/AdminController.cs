@@ -102,4 +102,113 @@ public class AdminController : Controller
         
         return RedirectToAction("Products");
     }
+
+    [HttpGet]
+    public IActionResult AddCategory()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddCategory(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            TempData["Error"] = "Kategori adı boş olamaz.";
+            return View();
+        }
+
+        var success = await _apiService.CreateCategoryAsync(name);
+        if (success)
+        {
+            TempData["Success"] = "Kategori başarıyla eklendi.";
+            return RedirectToAction("Categories"); // Or Categories
+        }
+        
+        TempData["Error"] = "Kategori eklenirken bir hata oluştu.";
+        return View();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EditCategory(int id)
+    {
+        // For simplicity, we can fetch all categories and find the specific one, 
+        // or add a GetCategoryAsync method to ApiService. 
+        // Given typically small list, getting all is fine for now, or use GetCategoryAsync if available.
+        // Wait, backend has GetCategory(id). Let's use that if we can, but ApiService doesn't have it exposed.
+        // Let's quickly add GetCategoryAsync if needed, or just iterate list for now as list is small.
+        // Actually, let's just stick to fetching all and filtering, or since we don't have GetCategoryAsync in ApiService yet,
+        // let's assume we can fetch all.
+        
+        var categories = await _apiService.GetCategoriesAsync();
+        var category = categories?.FirstOrDefault(c => c.Id == id);
+        
+        if (category == null) return NotFound();
+        return View(category);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> EditCategory(Category category)
+    {
+        if (string.IsNullOrWhiteSpace(category.Name))
+        {
+            TempData["Error"] = "Kategori adı boş olamaz.";
+            return View(category);
+        }
+
+        var success = await _apiService.UpdateCategoryAsync(category.Id, category.Name);
+        if (success)
+        {
+            TempData["Success"] = "Kategori başarıyla güncellendi.";
+            return RedirectToAction("Categories");
+        }
+
+        TempData["Error"] = "Kategori güncellenirken bir hata oluştu.";
+        return View(category);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> DeleteCategory(int id)
+    {
+        if (!IsAdmin()) return Forbid();
+
+        var success = await _apiService.DeleteCategoryAsync(id);
+        if (success)
+        {
+            TempData["Success"] = "Kategori silindi.";
+        }
+        else
+        {
+            TempData["Error"] = "Kategori silinemedi. Bu kategoriye bağlı ürünler olabilir.";
+        }
+        return RedirectToAction("Categories");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EditProduct(int id)
+    {
+        var product = await _apiService.GetProductAsync(id);
+        if (product == null) return NotFound();
+
+        var categories = await _apiService.GetCategoriesAsync() ?? new List<Category>();
+        ViewBag.Categories = categories;
+
+        return View(product);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> EditProduct(Product product)
+    {
+        var success = await _apiService.UpdateProductAsync(product.Id, product);
+        if (success)
+        {
+            TempData["Success"] = "Ürün başarıyla güncellendi.";
+            return RedirectToAction("Products");
+        }
+
+        var categories = await _apiService.GetCategoriesAsync() ?? new List<Category>();
+        ViewBag.Categories = categories;
+        TempData["Error"] = "Ürün güncellenirken bir hata oluştu.";
+        return View(product);
+    }
 }

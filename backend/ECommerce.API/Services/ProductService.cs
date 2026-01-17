@@ -16,7 +16,7 @@ public class ProductService : IProductService
         _userService = userService;
     }
 
-    public async Task<IEnumerable<ProductDto>> GetProductsAsync(int? categoryId, string? search, decimal? minPrice, decimal? maxPrice)
+    public async Task<IEnumerable<ProductDto>> GetProductsAsync(int? categoryId, string? search, decimal? minPrice, decimal? maxPrice, string? userId = null)
     {
         var query = _context.Products.Include(p => p.Category).AsQueryable();
         if (categoryId.HasValue) query = query.Where(p => p.CategoryId == categoryId.Value);
@@ -24,18 +24,36 @@ public class ProductService : IProductService
         if (minPrice.HasValue) query = query.Where(p => p.Price >= minPrice.Value);
         if (maxPrice.HasValue) query = query.Where(p => p.Price <= maxPrice.Value);
 
-        return await query.Select(p => new ProductDto
+        var products = await query.ToListAsync();
+        var favoriteProductIds = new HashSet<int>();
+
+        if (!string.IsNullOrEmpty(userId))
+        {
+            favoriteProductIds = (await _context.Favorites
+                .Where(f => f.UserId == userId)
+                .Select(f => f.ProductId)
+                .ToListAsync()).ToHashSet();
+        }
+
+        return products.Select(p => new ProductDto
         {
             Id = p.Id, Name = p.Name, Price = p.Price,
-            Stock = p.Stock, CategoryId = p.CategoryId, CategoryName = p.Category.Name
-        }).ToListAsync();
+            Stock = p.Stock, CategoryId = p.CategoryId, CategoryName = p.Category.Name,
+            IsFavorite = favoriteProductIds.Contains(p.Id)
+        });
     }
 
-    public async Task<ProductDto?> GetProductByIdAsync(int id)
+    public async Task<ProductDto?> GetProductByIdAsync(int id, string? userId = null)
     {
         var product = await _context.Products.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id);
         if (product == null) return null;
         
+        var isFavorite = false;
+        if (!string.IsNullOrEmpty(userId))
+        {
+            isFavorite = await _context.Favorites.AnyAsync(f => f.UserId == userId && f.ProductId == id);
+        }
+
         return new ProductDto
         {
             Id = product.Id, 
@@ -43,7 +61,8 @@ public class ProductService : IProductService
             Price = product.Price,
             Stock = product.Stock, 
             CategoryId = product.CategoryId, 
-            CategoryName = product.Category?.Name ?? "Kategori Yok"
+            CategoryName = product.Category?.Name ?? "Kategori Yok",
+            IsFavorite = isFavorite
         };
     }
 

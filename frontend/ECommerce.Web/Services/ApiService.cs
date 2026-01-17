@@ -157,6 +157,75 @@ public class ApiService
         });
         return response.IsSuccessStatusCode;
     }
+
+    // Favorites
+    public async Task<List<Favorite>?> GetFavoritesAsync()
+    {
+        SetAuthHeader();
+        try {
+            return await _httpClient.GetFromJsonAsync<List<Favorite>>($"{ApiBaseUrl}/Favorites");
+        } catch { return new List<Favorite>(); }
+    }
+
+    public async Task<bool> ToggleFavoriteAsync(int productId)
+    {
+        SetAuthHeader();
+        var response = await _httpClient.PostAsync($"{ApiBaseUrl}/Favorites/toggle/{productId}", null);
+        return response.IsSuccessStatusCode;
+    }
+
+    // Settings
+    public async Task<UserSettings?> GetSettingsAsync()
+    {
+        SetAuthHeader();
+        try {
+            return await _httpClient.GetFromJsonAsync<UserSettings>($"{ApiBaseUrl}/Settings");
+        } catch { return null; }
+    }
+
+    public async Task<bool> UpdateThemeAsync(bool darkModeEnabled)
+    {
+        SetAuthHeader();
+        var response = await _httpClient.PostAsJsonAsync($"{ApiBaseUrl}/Settings/theme", darkModeEnabled);
+        return response.IsSuccessStatusCode;
+    }
+
+    // Admin
+    public async Task<bool> CreateCategoryAsync(string name)
+    {
+        SetAuthHeader();
+        var response = await _httpClient.PostAsJsonAsync($"{ApiBaseUrl}/Categories", new { Name = name });
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> UpdateCategoryAsync(int id, string name)
+    {
+        SetAuthHeader();
+        var response = await _httpClient.PutAsJsonAsync($"{ApiBaseUrl}/Categories/{id}", new { Id = id, Name = name });
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> DeleteCategoryAsync(int id)
+    {
+        SetAuthHeader();
+        var response = await _httpClient.DeleteAsync($"{ApiBaseUrl}/Categories/{id}");
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> UpdateProductAsync(int id, Product product)
+    {
+        SetAuthHeader();
+        var dto = new 
+        { 
+            Id = id,
+            Name = product.Name,
+            Price = product.Price,
+            Stock = product.Stock,
+            CategoryId = product.CategoryId
+        };
+        var response = await _httpClient.PutAsJsonAsync($"{ApiBaseUrl}/Products/{id}", dto);
+        return response.IsSuccessStatusCode;
+    }
 }
 
 public class AuthResponse

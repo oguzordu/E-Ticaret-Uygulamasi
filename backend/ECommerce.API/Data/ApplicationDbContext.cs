@@ -16,6 +16,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<CartItem> CartItems { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<Favorite> Favorites { get; set; }
+    public DbSet<UserSettings> UserSettings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -108,6 +110,24 @@ public class ApplicationDbContext : DbContext
                   .WithMany(p => p.OrderItems)
                   .HasForeignKey(e => e.ProductId)
                   .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<Favorite>(entity =>
+        {
+            entity.ToTable("Favorites");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired();
+            entity.HasOne(e => e.Product)
+                  .WithMany() // No navigation property back to favorites needed on Product
+                  .HasForeignKey(e => e.ProductId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<UserSettings>(entity =>
+        {
+            entity.ToTable("UserSettings");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired();
         });
     }
 }

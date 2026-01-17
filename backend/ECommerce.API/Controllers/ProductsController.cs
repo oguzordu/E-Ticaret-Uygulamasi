@@ -20,12 +20,16 @@ public class ProductsController : ControllerBase
     public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts(
         [FromQuery] int? categoryId, [FromQuery] string? search,
         [FromQuery] decimal? minPrice, [FromQuery] decimal? maxPrice)
-        => Ok(await _productService.GetProductsAsync(categoryId, search, minPrice, maxPrice));
+    {
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        return Ok(await _productService.GetProductsAsync(categoryId, search, minPrice, maxPrice, userId));
+    }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<ProductDto>> GetProduct(int id)
     {
-        var product = await _productService.GetProductByIdAsync(id);
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var product = await _productService.GetProductByIdAsync(id, userId);
         return product == null ? NotFound() : Ok(product);
     }
 

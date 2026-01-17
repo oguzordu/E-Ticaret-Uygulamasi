@@ -1,0 +1,34 @@
+@{
+    ViewData["Title"] = "Kategori Ekle";
+    Layout = "_Layout";
+}
+
+<div class="container mt-5 animate-up">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+                    <h4 class="card-title fw-bold">Yeni Kategori Ekle</h4>
+                </div>
+                <div class="card-body p-4">
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["Error"]</div>
+                    }
+
+                    <form asp-action="AddCategory" method="post">
+                        <div class="mb-4">
+                            <label class="form-label text-secondary fw-bold small">KATEGORİ ADI</label>
+                            <input type="text" name="name" class="form-control form-control-lg bg-light border-0 fw-medium" placeholder="Örn: Teknoloji" required>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm">KAYDET</button>
+                            <a asp-action="Categories" class="btn btn-light fw-bold text-muted">İptal</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

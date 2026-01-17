@@ -50,12 +50,19 @@
                 <h1 class="display-5 fw-bold mb-3 text-primary">@Model.Name</h1>
                 
                 <div class="d-flex align-items-center gap-3 mb-4">
-                     <h2 class="display-6 fw-bold text-dark mb-0">@Model.Price.ToString("N2") ₺</h2>
+                     <h2 class="display-6 fw-bolder mb-0 product-price">@Model.Price.ToString("N2") ₺</h2>
                      @if(Model.Stock > 0) {
                          <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2">Stokta Var</span>
                      } else {
                          <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2">Tükendi</span>
                      }
+                     
+                     <form asp-controller="Home" asp-action="ToggleFavorite" method="post" class="ms-auto">
+                        <input type="hidden" name="productId" value="@Model.Id" />
+                        <button type="submit" class="btn btn-outline-danger btn-lg rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                            <i class="@(Model.IsFavorite ? "bi bi-heart-fill" : "bi bi-heart") fs-4"></i>
+                        </button>
+                     </form>
                 </div>
 
                 <p class="text-secondary lead mb-5">
@@ -68,10 +75,10 @@
                     
                     <div class="mb-4">
                         <label class="small fw-bold text-secondary mb-2 d-block">ADET</label>
-                         <div class="bg-white border rounded-pill d-inline-flex align-items-center px-2 py-1">
-                             <button type="button" class="btn btn-sm rounded-circle" onclick="this.nextElementSibling.stepDown()"><i class="bi bi-dash"></i></button>
-                             <input type="number" name="quantity" class="form-control border-0 text-center fw-bold bg-transparent" value="1" min="1" max="@Model.Stock" style="width: 50px; appearance: textfield;">
-                             <button type="button" class="btn btn-sm rounded-circle" onclick="this.previousElementSibling.stepUp()"><i class="bi bi-plus"></i></button>
+                         <div class="border rounded-pill d-inline-flex align-items-center px-2 py-1 quantity-container">
+                             <button type="button" class="btn btn-sm btn-light rounded-circle border shadow-sm" onclick="this.nextElementSibling.stepDown()"><i class="bi bi-dash fw-bold"></i></button>
+                             <input type="number" name="quantity" class="form-control border-0 text-center fw-bolder fs-5 bg-transparent" value="1" min="1" max="@Model.Stock" style="width: 60px; appearance: textfield; color: var(--text-primary) !important;">
+                             <button type="button" class="btn btn-sm btn-light rounded-circle border shadow-sm" onclick="this.previousElementSibling.stepUp()"><i class="bi bi-plus fw-bold"></i></button>
                          </div>
                     </div>
 

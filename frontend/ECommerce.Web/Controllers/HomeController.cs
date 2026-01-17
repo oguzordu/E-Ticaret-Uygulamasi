@@ -35,4 +35,19 @@ public class HomeController : Controller
         
         return View(product);
     }
+
+    [HttpPost]
+    public async Task<IActionResult> ToggleFavorite(int productId)
+    {
+        var success = await _apiService.ToggleFavoriteAsync(productId);
+        // İsteğin geldiği fabrikayı (kaynağı) kontrol et, eğer ajax değilse geri yönlendir
+        return Redirect(Request.Headers["Referer"].ToString());
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> UpdateTheme([FromBody] bool darkModeEnabled)
+    {
+        await _apiService.UpdateThemeAsync(darkModeEnabled);
+        return Ok();
+    }
 }

@@ -66,13 +66,10 @@
                             <td><span class="badge bg-light text-dark border">@product.CategoryName</span></td>
                             <td class="fw-bold text-primary">@product.Price.ToString("C")</td>
                             <td>
-                                <form asp-action="UpdateStock" method="post" class="d-flex align-items-center gap-2">
-                                    <input type="hidden" name="id" value="@product.Id" />
-                                    <input type="number" name="stock" value="@product.Stock" class="form-control form-control-sm border-secondary bg-white fw-bold text-center product-stock-input" style="width: 80px;" min="0" />
-                                    <button type="submit" class="btn btn-sm btn-dark rounded-pill px-3 shadow-sm d-flex align-items-center gap-2">
-                                        <span>Güncelle</span>
-                                    </button>
-                                </form>
+                                <a asp-action="EditProduct" asp-route-id="@product.Id" class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-sm d-flex align-items-center gap-2">
+                                    <i class="bi bi-pencil-square"></i>
+                                    <span>Düzenle</span>
+                                </a>
                             </td>
                             <td class="pe-4 text-end">
                                 @if (product.Stock > 0)
