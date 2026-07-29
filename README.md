@@ -1,48 +1,58 @@
-# E-Ticaret Projesi
+# E-Commerce Platform
 
-Temel e-ticaret işlevlerini içeren bir sistem geliştirdim. Kullanıcılar ürünleri görüntüleyebiliyor, sepete ekleyip sipariş verebiliyor. Ayrıca yöneticiler için bir admin paneli ekledim.
+A full-stack e-commerce system where users can browse products, add them to a
+cart, and place orders. Includes an admin panel for managing products and
+orders.
 
-## Kullandığım Teknolojiler
+## Tech Stack
 
-Ders kapsamında API geliştirmek gerektiği için backend tarafında **ASP.NET Core Web API** kullandım. Veritabanı işlemlerini **Entity Framework Core** ile yaptım ve kullanıcı girişinde **JWT token** yapısını kurdum. API testleri için **Swagger**'dan yararlandım.
+Built as a coursework project that required building an API from scratch:
+**ASP.NET Core Web API** on the backend, **Entity Framework Core** for data
+access, and **JWT** for authentication. Endpoints were tested with Swagger
+throughout development.
 
-Arayüz kısmını oluşturmam gerektiği için de **ASP.NET Core MVC** ve **Bootstrap** kullandım.
+The frontend uses **ASP.NET Core MVC** with **Bootstrap**.
 
-## Projenin Yapısı
+## Architecture
 
 ### Backend
 
-- Modelleri oluşturdum: Users, Products, Categories, CartItems, Orders, OrderItems.
-- DbContext içerisinde ilişkileri ve tabloları tanımladım.
-- Controller'ları yazdım (Auth, Products, Cart, Orders, Categories).
-- Tüm iş mantığını service katmanına koydum ve interface yapısı kullandım.
-- JWT token ile kimlik doğrulama ekledim.
-- Frontend'in API'ye erişebilmesi için CORS ayarlarını yaptım.
+- Domain models: Users, Products, Categories, CartItems, Orders, OrderItems
+- Relationships and tables defined via `DbContext`
+- Controllers: Auth, Products, Cart, Orders, Categories
+- Business logic isolated in a service layer behind interfaces
+- JWT-based authentication
+- CORS configured so the frontend can reach the API
 
 ### Frontend
 
-- MVC ile ürün listeleme, arama ve kategori filtreleme özelliklerini yaptım.
-- Ürün detay, sepet ve sipariş sayfalarını oluşturdum.
-- Admin paneli ekleyerek ürün ve sipariş yönetimi ekledim.
-- API'den veri çekmek için frontend tarafında bir service sınıfı yazdım.
+- Product listing, search, and category filtering (MVC)
+- Product detail, cart, and order pages
+- Admin panel for product and order management
+- A dedicated service class handles all API calls from the frontend
 
-## Veritabanı Yapısı
+### Database
 
-Users, Categories, Products, CartItems, Orders ve OrderItems olmak üzere altı tablo kullandım.
+Six tables: Users, Categories, Products, CartItems, Orders, OrderItems, with
+foreign-key relationships (category–product, user–cart, order–order items).
 
-Kategori–ürün, kullanıcı–sepet ve sipariş–sipariş öğeleri gibi ilişkileri foreign key olarak tanımladım.
+## How it was built
 
-## Yapım Süreci
+Backend first — models, migrations, and the API — then the MVC frontend wired
+up to it.
 
-Önce backend'i geliştirdim, migration işlemleri ve API yapısını kurdum. Ardından MVC tarafını oluşturdum ve API ile haberleştirdim.
+The two things that took the most iteration: CORS configuration, and where to
+store the JWT on the frontend (ended up using session storage).
 
-CORS ayarları ve frontend'de token saklama kısmında zorlandım; token'ı session'da saklayarak çözdüm.
+## How it works
 
-## Sistemin Çalışma Şekli
+The user logs in and receives a token, which is attached to every subsequent
+request. From there they can browse products, view details, add items to
+the cart, and place orders. Admins get a separate panel for managing products
+and orders.
 
-Kullanıcı giriş yaptığında token alıyor ve bütün isteklerde bunu kullanıyor.
+## Future Improvements
 
-Ürünleri listeleyip detaylara bakabiliyor, sepete ekleyip sipariş verebiliyor.
-
-Admin panelinde yöneticiler ürün ve sipariş yönetimi yapabiliyor.
-
+- Refresh tokens instead of a single long-lived JWT
+- Unit tests for the service layer
+- Pagination on the product listing endpoint
