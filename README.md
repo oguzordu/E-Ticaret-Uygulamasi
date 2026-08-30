@@ -1,5 +1,7 @@
 # E-Commerce Platform
 
+[![CI](https://github.com/oguzordu/ecommerce-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/oguzordu/ecommerce-platform/actions/workflows/ci.yml)
+
 ## Türkçe
 
 Temel e-ticaret işlevlerini içeren bir sistem: kullanıcılar ürünleri
