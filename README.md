@@ -41,6 +41,81 @@ Altı tablo: Users, Categories, Products, CartItems, Orders, OrderItems.
 Kategori–ürün, kullanıcı–sepet ve sipariş–sipariş öğeleri ilişkileri foreign
 key olarak tanımlandı.
 
+### Kurulum ve Çalıştırma
+
+**Gerekenler**
+
+- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- SQL Server LocalDB — Visual Studio ile birlikte gelir. Ayrı kurmak isteyen:
+  [SQL Server Express LocalDB](https://learn.microsoft.com/sql/database-engine/configure-windows/sql-server-express-localdb)
+- EF Core komut satırı aracı:
+  ```bash
+  dotnet tool install --global dotnet-ef
+  ```
+
+**1. Repoyu klonla**
+
+```bash
+git clone https://github.com/oguzordu/ecommerce-platform.git
+cd ecommerce-platform
+```
+
+**2. HTTPS sertifikasına güven** (frontend API'ye HTTPS üzerinden bağlanıyor)
+
+```bash
+dotnet dev-certs https --trust
+```
+
+**3. Veritabanını oluştur**
+
+Migration'lar repoda hazır, `script.sql` dosyasına ihtiyaç yok:
+
+```bash
+cd backend/ECommerce.API
+dotnet ef database update
+```
+
+Bu, `appsettings.json` içindeki bağlantı dizesini kullanarak
+`(localdb)\mssqllocaldb` üzerinde `ECommerceDB` veritabanını kurar.
+Farklı bir SQL Server kullanacaksan `appsettings.json` içindeki
+`ConnectionStrings:DefaultConnection` değerini değiştir.
+
+**4. API'yi başlat**
+
+```bash
+cd backend/ECommerce.API
+dotnet run --launch-profile https
+```
+
+API `https://localhost:7125` adresinde açılır. Swagger arayüzü:
+`https://localhost:7125/swagger`
+
+⚠️ **`https` profili şart.** Frontend, API adresini
+`frontend/ECommerce.Web/Services/ApiService.cs` içinde sabit olarak
+`https://localhost:7125/api` şeklinde tutuyor. Farklı bir portta çalıştırırsan
+o dosyayı da güncellemen gerekir.
+
+**5. Frontend'i başlat** (API çalışır durumdayken, ikinci bir terminalde)
+
+```bash
+cd frontend/ECommerce.Web
+dotnet run
+```
+
+Siteyi `https://localhost:7196` adresinde aç.
+
+**Sıra önemli:** önce API, sonra frontend. API kapalıyken site açılır ama
+ürünler yüklenmez.
+
+### Bilinen Sınırlamalar
+
+- `appsettings.json` içindeki JWT anahtarı repoda açık duruyor. Ders projesi
+  olduğu için böyle bırakıldı; gerçek bir dağıtımda ortam değişkeni veya
+  kullanıcı gizli anahtarları (user secrets) kullanılmalı.
+- `script.sql` dosyası içinde `C:\Users\Oguz\...` şeklinde sabit dosya yolları
+  var. Migration'ları kullan, o dosyayı çalıştırma.
+
+
 ### Yapım Süreci
 
 Önce backend geliştirildi — modeller, migration'lar ve API — ardından MVC
@@ -101,6 +176,81 @@ The frontend uses **ASP.NET Core MVC** with **Bootstrap**.
 
 Six tables: Users, Categories, Products, CartItems, Orders, OrderItems, with
 foreign-key relationships (category–product, user–cart, order–order items).
+
+### Setup and Running
+
+**Prerequisites**
+
+- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- SQL Server LocalDB — ships with Visual Studio, or install
+  [SQL Server Express LocalDB](https://learn.microsoft.com/sql/database-engine/configure-windows/sql-server-express-localdb)
+  separately
+- EF Core CLI tool:
+  ```bash
+  dotnet tool install --global dotnet-ef
+  ```
+
+**1. Clone**
+
+```bash
+git clone https://github.com/oguzordu/ecommerce-platform.git
+cd ecommerce-platform
+```
+
+**2. Trust the HTTPS development certificate** (the frontend calls the API over HTTPS)
+
+```bash
+dotnet dev-certs https --trust
+```
+
+**3. Create the database**
+
+Migrations are committed, so `script.sql` is not needed:
+
+```bash
+cd backend/ECommerce.API
+dotnet ef database update
+```
+
+This creates `ECommerceDB` on `(localdb)\mssqllocaldb` using the connection
+string in `appsettings.json`. To use a different SQL Server instance, edit
+`ConnectionStrings:DefaultConnection` there.
+
+**4. Start the API**
+
+```bash
+cd backend/ECommerce.API
+dotnet run --launch-profile https
+```
+
+The API listens on `https://localhost:7125`. Swagger UI:
+`https://localhost:7125/swagger`
+
+⚠️ **The `https` profile is required.** The frontend hard-codes the API address
+as `https://localhost:7125/api` in
+`frontend/ECommerce.Web/Services/ApiService.cs`. If you run the API on a
+different port, update that file too.
+
+**5. Start the frontend** (in a second terminal, with the API running)
+
+```bash
+cd frontend/ECommerce.Web
+dotnet run
+```
+
+Open `https://localhost:7196`.
+
+**Order matters:** API first, then the frontend. The site loads without the API
+but no products will appear.
+
+### Known Limitations
+
+- The JWT secret in `appsettings.json` is committed to the repository. It was
+  left this way because this is a coursework project; a real deployment should
+  use environment variables or user secrets.
+- `script.sql` contains hard-coded `C:\Users\Oguz\...` file paths. Use the
+  migrations instead of running that file.
+
 
 ### How it was built
 
